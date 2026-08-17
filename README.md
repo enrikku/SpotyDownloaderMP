@@ -66,7 +66,7 @@ La app necesita credenciales de la API de Spotify para buscar.
 
 | Cómo usas la app | Dónde va `appsettings.json` |
 |---|---|
-| Release descargado / compilado | En la misma carpeta que el ejecutable |
+| Release descargado / compilado | En la misma carpeta que el ejecutable (el release ya trae `appsettings.example.json`: rellénalo y renómbralo) |
 | Desde el código fuente (`dotnet run`) | En `SpotyDownloaderMP/`, junto a `SpotyDownloaderMP.csproj` |
 
 Atajo desde el código fuente:
@@ -172,7 +172,7 @@ dist/
 
 Los binarios son autocontenidos y de archivo único (no requieren tener .NET instalado en la máquina de destino).
 
-> **Ojo con las credenciales:** el `appsettings.json` que tengas en `SpotyDownloaderMP/` se copia a la salida de compilación, así que acaba dentro de los paquetes de `dist/`. Si vas a repartir un release, borra o sustituye ese archivo dentro del paquete antes de publicarlo.
+Tu `appsettings.json` local **no** se incluye en los paquetes de `dist/` (`CopyToPublishDirectory=Never` en el csproj): el release lleva solo `appsettings.example.json`, para que cada usuario ponga sus credenciales. Es decir, puedes publicar un release sin filtrar tus claves.
 
 ### Debug local
 
@@ -191,5 +191,5 @@ dotnet run --project SpotyDownloaderMP/SpotyDownloaderMP.csproj
 | `HTTP Error 403: Forbidden` | YouTube bloquea ese vídeo concreto | Probar **Actualizar yt-dlp**; si sigue, la canción se marca como error y la descarga continúa |
 | `No se encontró ningún artista` | El artista no existe en Spotify o hay un error tipográfico | Revisar el nombre |
 | `Faltan ClientId o ClientSecret` | `appsettings.json` no tiene las credenciales | Ver sección de configuración de Spotify |
-| `The configuration file 'appsettings.json' was not found` | No has creado el `appsettings.json` (no viene en el repositorio) | Crearlo a partir de `appsettings.example.json`, ver sección de configuración de Spotify |
+| `No se encontró 'appsettings.json'` | No has creado el `appsettings.json` (no viene ni en el repositorio ni en el release) | Crearlo a partir de `appsettings.example.json`, ver sección de configuración de Spotify |
 | `Error: Invalid client` al buscar | Las credenciales existen pero son incorrectas o están revocadas | Regenerar el Client Secret en el dashboard de Spotify |

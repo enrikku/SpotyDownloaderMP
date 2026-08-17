@@ -28,8 +28,15 @@
     </ItemGroup>
 
     <ItemGroup>
+      <!-- Credenciales locales: se copian al compilar, pero nunca al publicar un release -->
       <None Update="appsettings.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      </None>
+      <!-- La plantilla viaja en el release para que el usuario la rellene y la renombre -->
+      <None Update="appsettings.example.json">
+        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </None>
     </ItemGroup>
 </Project>

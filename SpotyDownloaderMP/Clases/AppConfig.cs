@@ -8,6 +8,16 @@ public static class AppConfig
 
     private static IConfiguration Build()
     {
+        var path = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+
+        if (!File.Exists(path))
+        {
+            throw new FileNotFoundException(
+                "No se encontró 'appsettings.json'. Copia 'appsettings.example.json' como " +
+                $"'appsettings.json' en {AppContext.BaseDirectory} y pon tus credenciales de Spotify.",
+                path);
+        }
+
         return new ConfigurationBuilder()
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: false)
