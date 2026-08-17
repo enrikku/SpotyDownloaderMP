@@ -1,0 +1,13 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+/.idea
+dist/
+.vs/
+SpotyDownloader.slnx
+
+# Credenciales locales de Spotify (usar appsettings.example.json como plantilla)
+appsettings.json
+!appsettings.example.json

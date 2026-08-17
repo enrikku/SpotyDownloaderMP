@@ -1,0 +1,364 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:clases="using:SpotyDownloaderMP.Clases"
+        xmlns:asyncImageLoader="using:AsyncImageLoader"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="600"
+        x:Class="SpotyDownloaderMP.MainWindow"
+        WindowState="Maximized"
+        Background="#121212"
+        Title="SpotyDownloaderMP">
+
+    <Window.Styles>
+        <!-- Botón principal estilo Spotify -->
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="#1DB954"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1ed760"/>
+        </Style>
+
+        <!-- Botón secundario -->
+        <Style Selector="Button.secondary">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#B3B3B3"/>
+            <Setter Property="BorderBrush" Value="#535353"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style Selector="Button.secondary:pointerover">
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <!-- Caja de búsqueda -->
+        <Style Selector="TextBox.search">
+            <Setter Property="Background" Value="#242424"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <!-- Selector de formato de audio -->
+        <Style Selector="ComboBox.format">
+            <Setter Property="Background" Value="#242424"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="ComboBox.format ComboBoxItem">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+
+        <Style Selector="TextBlock.sectionTitle">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+        </Style>
+
+        <Style Selector="TextBlock.subtle">
+            <Setter Property="Foreground" Value="#B3B3B3"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="4"/>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#242424"/>
+        </Style>
+
+        <!-- Tarjeta de álbum -->
+        <Style Selector="Border.albumCover">
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="ClipToBounds" Value="True"/>
+            <Setter Property="Background" Value="#2a2a2a"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="24">
+
+        <!-- Cabecera -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,20">
+            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                <Ellipse Width="12" Height="12" Fill="#1DB954" VerticalAlignment="Center"/>
+                <TextBlock Text="SpotyDownloaderMP" Foreground="White" FontSize="22" FontWeight="Bold" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <TextBlock x:Name="VersionText"
+                           Classes="subtle"
+                           VerticalAlignment="Center"
+                           Text="Comprobando versiones..."/>
+
+                <Button x:Name="UpdateYtDlpButton"
+                        Click="UpdateYtDlpButton_OnClick"
+                        Classes="secondary"
+                        Content="Actualizar yt-dlp"
+                        FontSize="12"
+                        Padding="10,4"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Buscador -->
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0,0,0,20">
+            <ComboBox x:Name="SearchModeComboBox"
+                      Grid.Column="0"
+                      Classes="format"
+                      Width="120"
+                      SelectedIndex="0"
+                      SelectionChanged="SearchModeComboBox_OnSelectionChanged">
+                <ComboBoxItem Content="Artista" Tag="artist"/>
+                <ComboBoxItem Content="Canción" Tag="track"/>
+                <ComboBoxItem Content="Playlist" Tag="playlist"/>
+            </ComboBox>
+
+            <TextBox x:Name="SearchBox"
+                     Grid.Column="1"
+                     Classes="search"
+                     Watermark="Escribe el nombre del artista..."
+                     Margin="10,0,0,0"
+                     KeyDown="SearchBox_OnKeyDown"/>
+
+            <Button x:Name="SearchButton"
+                    Click="SearchButton_OnClick"
+                    Grid.Column="2"
+                    Classes="primary"
+                    Content="Buscar"
+                    Margin="10,0,0,0"/>
+
+            <ComboBox x:Name="FormatComboBox"
+                      Grid.Column="3"
+                      Classes="format"
+                      Width="100"
+                      SelectedIndex="0"
+                      Margin="10,0,0,0">
+                <ComboBoxItem Content="MP3" Tag="mp3"/>
+                <ComboBoxItem Content="FLAC" Tag="flac"/>
+                <ComboBoxItem Content="WAV" Tag="wav"/>
+                <ComboBoxItem Content="M4A" Tag="m4a"/>
+                <ComboBoxItem Content="OPUS" Tag="opus"/>
+            </ComboBox>
+
+            <Button x:Name="DownloadAllButton"
+                    Click="DownloadAllButton_OnClick"
+                    Grid.Column="4"
+                    Classes="secondary"
+                    Content="Descargar"
+                    Margin="10,0,0,0"/>
+        </Grid>
+
+        <!-- Resultados de la búsqueda -->
+        <Border Grid.Row="2" Background="#181818" CornerRadius="10" Padding="16">
+            <Grid RowDefinitions="Auto,Auto,*">
+                <TextBlock x:Name="ResultsTitle" Grid.Row="0" Classes="sectionTitle" Text="Álbumes"/>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
+                    <Button Content="Seleccionar todos" Classes="secondary" FontSize="12" Padding="10,4"
+                            Click="SelectAllButton_OnClick"/>
+                    <Button Content="Deseleccionar todos" Classes="secondary" FontSize="12" Padding="10,4"
+                            Click="DeselectAllButton_OnClick"/>
+                </StackPanel>
+
+                <Grid Grid.Row="2">
+                    <!-- Modo Artista: álbumes -->
+                    <ScrollViewer x:Name="AlbumsScroll">
+                        <ListBox x:Name="AlbumsList"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 SelectionMode="Multiple">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="clases:AlbumResult">
+                                    <Grid Width="150">
+                                        <!-- Tarjeta -->
+                                        <StackPanel>
+                                            <Border Classes="albumCover" Height="150" Width="150">
+                                                <Panel>
+                                                    <Image asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"
+                                                           Stretch="UniformToFill"
+                                                           Width="150" Height="150"/>
+
+                                                    <!-- Checkbox flotante encima de la portada -->
+                                                    <Border Background="#B3121212"
+                                                            CornerRadius="12"
+                                                            Width="26" Height="26"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Top"
+                                                            Margin="6">
+                                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"
+                                                                  Margin="0"/>
+                                                    </Border>
+                                                </Panel>
+                                            </Border>
+
+                                            <TextBlock Text="{Binding Name}"
+                                                       Foreground="White"
+                                                       FontSize="13"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap"
+                                                       MaxLines="2"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Margin="0,8,0,0"/>
+
+                                            <TextBlock Classes="subtle" Margin="0,2,0,0">
+                                                <Run Text="{Binding AlbumType}"/>
+                                                <Run Text=" · "/>
+                                                <Run Text="{Binding ReleaseDate}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Text="{Binding TotalTracks, StringFormat='{}{0} canciones'}"
+                                                       Classes="subtle"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+
+                    <!-- Modo Canción: resultados individuales -->
+                    <ScrollViewer x:Name="SongsScroll" IsVisible="False">
+                        <ListBox x:Name="SongsList"
+                                 Background="Transparent"
+                                 BorderThickness="0">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="clases:SongResult">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="4,6">
+                                        <CheckBox Grid.Column="0"
+                                                  IsChecked="{Binding IsSelected}"
+                                                  VerticalAlignment="Center"
+                                                  Margin="0,0,10,0"/>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Title}"
+                                                       Foreground="White"
+                                                       FontSize="14"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Classes="subtle">
+                                                <Run Text="{Binding Artist}"/>
+                                                <Run Text=" · "/>
+                                                <Run Text="{Binding AlbumName}"/>
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding Duration}"
+                                                   Classes="subtle"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0"/>
+
+                                        <TextBlock Grid.Column="3"
+                                                   Text="{Binding Status}"
+                                                   Classes="subtle"
+                                                   VerticalAlignment="Center"
+                                                   Width="90"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+
+                    <!-- Modo Playlist: playlists encontradas -->
+                    <ScrollViewer x:Name="PlaylistsScroll" IsVisible="False">
+                        <ListBox x:Name="PlaylistsList"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 SelectionMode="Multiple">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="clases:PlaylistResult">
+                                    <Grid Width="150">
+                                        <StackPanel>
+                                            <Border Classes="albumCover" Height="150" Width="150">
+                                                <Panel>
+                                                    <Image asyncImageLoader:ImageLoader.Source="{Binding ImageUrl}"
+                                                           Stretch="UniformToFill"
+                                                           Width="150" Height="150"/>
+
+                                                    <Border Background="#B3121212"
+                                                            CornerRadius="12"
+                                                            Width="26" Height="26"
+                                                            HorizontalAlignment="Right"
+                                                            VerticalAlignment="Top"
+                                                            Margin="6">
+                                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"
+                                                                  Margin="0"/>
+                                                    </Border>
+                                                </Panel>
+                                            </Border>
+
+                                            <TextBlock Text="{Binding Name}"
+                                                       Foreground="White"
+                                                       FontSize="13"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap"
+                                                       MaxLines="2"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       Margin="0,8,0,0"/>
+
+                                            <TextBlock Text="{Binding Owner}"
+                                                       Classes="subtle"
+                                                       Margin="0,2,0,0"/>
+
+                                            <TextBlock Text="{Binding TotalTracks, StringFormat='{}{0} canciones'}"
+                                                       Classes="subtle"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Barra de estado / progreso -->
+        <Grid Grid.Row="3" RowDefinitions="Auto,Auto" Margin="0,16,0,0">
+            <ProgressBar x:Name="DownloadProgress"
+                         Grid.Row="0"
+                         Height="6"
+                         CornerRadius="3"
+                         Background="#242424"
+                         Foreground="#1DB954"
+                         Minimum="0" Maximum="100" Value="0"/>
+
+            <TextBlock x:Name="StatusText"
+                       Grid.Row="1"
+                       Classes="subtle"
+                       Margin="0,8,0,0"
+                       Text="Listo para buscar."/>
+        </Grid>
+    </Grid>
+</Window>
